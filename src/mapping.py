@@ -2,16 +2,19 @@ import geopandas as gpd
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
+from matplotlib import colormaps
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 def plot_cluster_map(
-    geojson_path="/Users/wayeien/Documents/JOB/Portofolio/github/credit-segmentation-indonesia/data/geo/indonesia-prov.geojson",
-    clustered_csv="/Users/wayeien/Documents/JOB/Portofolio/github/credit-segmentation-indonesia/data/processed/kredit_jp_op_clustered_dualsegment.csv",
-    output_path="figures/map_cluster_jp_op_segmented.png"
+    geojson_path=PROJECT_ROOT / "data/geo/indonesia-prov.geojson",
+    clustered_csv=PROJECT_ROOT / "data/processed/kredit_jp_op_clustered_dualsegment.csv",
+    output_path=PROJECT_ROOT / "figures/map_cluster_jp_op_segmented.png"
 ):
     # Load clustering data
     df = pd.read_csv(clustered_csv)
-    df = df[df["provinsi"].str.lower() != "lainnya"]
 
     # Normalisasi nama provinsi
     df["provinsi"] = (
@@ -44,7 +47,7 @@ def plot_cluster_map(
     gdf_merged = gdf.merge(df[["provinsi", "cluster", "segment"]], on="provinsi", how="left")
 
     # Setup colormap
-    cmap = plt.cm.get_cmap("tab10")
+    cmap = colormaps.get_cmap("tab10")
     cluster_labels = sorted(gdf_merged["cluster"].dropna().unique())
     colors = [cmap(i) for i in range(len(cluster_labels))]
     color_map = dict(zip(cluster_labels, colors))
@@ -74,20 +77,22 @@ def plot_cluster_map(
         ax.legend(handles=legend_patches, title="Cluster", loc="lower left", fontsize=8)
 
         # Tambah nama provinsi
-        for idx, row in subset.iterrows():
+        for _, row in subset.iterrows():
+            if row["geometry"] is None:
+                continue
             try:
                 x, y = row["geometry"].centroid.coords[0]
                 ax.text(x, y, row["provinsi"].title(), fontsize=7, ha="center", color="black")
-            except:
+            except Exception:
                 continue
 
-        ax.set_title(f"Segment: {segment.capitalize()}", fontsize=12)
+        ax.set_title(f"Segment: {segment.replace('_', ' ').title()}", fontsize=12)
         ax.axis("off")
 
-    plt.suptitle("Peta Klaster Provinsi Berdasarkan Kredit JP-OP", fontsize=16)
-    plt.tight_layout()
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    plt.savefig(output_path, dpi=300)
+    fig.suptitle("Peta Klaster Provinsi Berdasarkan Kredit JP-OP", fontsize=16)
+    fig.tight_layout()
+    os.makedirs(output_path.parent, exist_ok=True)
+    fig.savefig(output_path, dpi=300)
     plt.show()
 
     print(f"Peta klaster segmented disimpan di: {output_path}")

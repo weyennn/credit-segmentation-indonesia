@@ -48,17 +48,21 @@ sangat besar (misalnya DKI Jakarta) dalam proses clustering.
 
 ## Hasil Segmentasi
 
-### Segmen High-Volume
-- Jumlah klaster optimal: **2**
-- Silhouette Score tertinggi: **0,7921**
-- Distribusi klaster:
-  - Klaster 1: 8 provinsi
-  - Klaster 2: 1 provinsi (DKI Jakarta sebagai outlier)
+> Data mencakup **33 provinsi** (Kalimantan Utara tidak tersedia dalam data OJK Februari 2025).
 
-### Segmen Normal-Volume
-- Jumlah klaster optimal: **5**
-- Silhouette Score tertinggi: **0,3984**
-- Klaster mencerminkan keberagaman karakteristik kredit antar provinsi
+### Segmen High-Volume (8 provinsi — Q75 tertinggi)
+- Jumlah klaster optimal: **2** | Silhouette Score: **0,7906**
+- Distribusi klaster:
+  - Klaster 0: 1 provinsi — DKI Jakarta (outlier ekstrem)
+  - Klaster 1: 7 provinsi — Jawa Barat, Jawa Timur, Jawa Tengah, Banten, Sumatera Utara, Sumatera Selatan, Sulawesi Selatan
+
+### Segmen Normal-Volume (25 provinsi)
+- Jumlah klaster optimal: **4** | Silhouette Score: **0,4113**
+- Distribusi klaster:
+  - Klaster 0: 7 provinsi — Bengkulu, Bangka Belitung, Gorontalo, Sulawesi Barat, Maluku, Maluku Utara, Papua Barat
+  - Klaster 1: 14 provinsi — D.I Yogyakarta, Jambi, Aceh, Sumatera Barat, Lampung, Kalimantan Selatan, Kalimantan Barat, Kalimantan Tengah, Sulawesi Tengah, Sulawesi Utara, Sulawesi Tenggara, NTB, NTT, Papua
+  - Klaster 2: 3 provinsi — Riau, Kalimantan Timur, Bali
+  - Klaster 3: 1 provinsi — Kepulauan Riau
 
 ---
 
@@ -89,7 +93,10 @@ sangat besar (misalnya DKI Jakarta) dalam proses clustering.
 ## Visualisasi
 - Visualisasi PCA dan pemetaan klaster tersedia pada folder `/figures`:
   - `map_cluster_jp_op_segmented.png` – Peta klaster kredit per segmen
-  - `cluster_result_pca.png` – Proyeksi PCA hasil clustering
+  - `high_volume_pca.png` – Proyeksi PCA segmen high-volume
+  - `normal_volume_pca.png` – Proyeksi PCA segmen normal-volume
+  - `k_evaluation_high_volume.png` – Grafik evaluasi k segmen high-volume
+  - `k_evaluation_normal_volume.png` – Grafik evaluasi k segmen normal-volume
 
 ---
 
@@ -118,7 +125,7 @@ data/
 └── geo/
 
 EDA/
-└── eksplorasi_data_kredit.py
+└── eksplorasi_data_kredit.ipynb
 
 figures/
 └── *.png

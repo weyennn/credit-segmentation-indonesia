@@ -1,40 +1,42 @@
 import pandas as pd
 import os
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+FEATURE_COLS = [
+    "modal_kerja",
+    "investasi",
+    "konsumsi",
+    "ekspor",
+    "impor",
+    "lainnya"
+]
 
 def generate_features(
-    input_path="/Users/wayeien/Documents/JOB/Portofolio/github/credit-segmentation-indonesia/data/processed/kredit_jp_op_clean.csv",
-    output_path="/Users/wayeien/Documents/JOB/Portofolio/github/credit-segmentation-indonesia/data/processed/kredit_jp_op_features.csv"
+    input_path=PROJECT_ROOT / "data/processed/kredit_jp_op_clean.csv",
+    output_path=PROJECT_ROOT / "data/processed/kredit_jp_op_features.csv"
 ):
     print("Membuat fitur dari:", input_path)
 
-    # Load data hasil preprocessing
     df = pd.read_csv(input_path)
 
-    # Pilih kolom numerik untuk clustering
-    feature_cols = [
-        "modal_kerja", 
-        "investasi", 
-        "konsumsi", 
-        "ekspor", 
-        "impor", 
-        "lainnya"
-    ]
-
-    df_features = df[["provinsi"] + feature_cols].copy()
+    df_features = df[["provinsi"] + FEATURE_COLS].copy()
 
     # Pastikan semua fitur numerik
-    df_features[feature_cols] = df_features[feature_cols].apply(pd.to_numeric, errors='coerce')
+    df_features[FEATURE_COLS] = df_features[FEATURE_COLS].apply(pd.to_numeric, errors='coerce')
 
-    # Drop NaN
+    # Drop jika ada NaN setelah konversi
     df_features = df_features.dropna()
 
-    # Buang 1 baris terakhir 
-    df_features= df_features.iloc[:-1]
+    # Hitung total kredit per provinsi sebagai dasar segmentasi dua tingkat
+    df_features["total_kredit"] = df_features[FEATURE_COLS].sum(axis=1)
 
     # Simpan hasil fitur
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    os.makedirs(output_path.parent, exist_ok=True)
     df_features.to_csv(output_path, index=False)
     print(f"Fitur disimpan ke: {output_path}")
+    print(f"Jumlah provinsi: {len(df_features)}")
 
 if __name__ == "__main__":
     generate_features()
